@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>文意選填第3冊詳解版</title>
+    <style>
+        body{font-family:Arial;margin:20px;color:#333}
+        .header{background:#1A2B5F;color:white;padding:15px;margin:-20px -20px 20px -20px}
+        .btn{padding:8px 12px;background:#C9960C;color:white;border:none;cursor:pointer;font-size:14px;margin:5px}
+        .quiz{background:#f5f5f5;padding:15px;margin:10px 0;border-radius:5px}
+        .option{padding:10px;margin:5px 0;background:white;cursor:pointer;border:2px solid #ddd;border-radius:3px;font-size:13px}
+        .option:hover{background:#fffacd}
+        .correct{background:#e8f5e9;border-color:#4caf50}
+        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+        .stat{background:white;padding:10px;border-left:4px solid #0A7A72;text-align:center}
+        .stat-val{font-size:20px;font-weight:bold;color:#C9960C}
+        .passage{background:#fafafa;padding:12px;border-left:3px solid #0A7A72;margin:10px 0;line-height:1.8;font-size:13px}
+        .blank{background:#fff9e6;padding:2px 4px;font-weight:bold;color:#d97706}
+        .zh-trans{background:#e3f2fd;padding:10px;border-left:3px solid #1976d2;margin:10px 0;font-size:12px;line-height:1.7;color:#0d47a1}
+        .zh-title{font-weight:bold;color:#0d47a1;margin-bottom:5px}
+        .xray{background:#fff3e0;padding:12px;border-left:3px solid #f57c00;margin-top:10px;font-size:11px;line-height:1.6}
+        .xray-title{font-weight:bold;color:#e65100;margin-bottom:8px}
+        .xray-item{margin:5px 0;color:#333}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 大學學測文意選填系統 - 第3冊 詳解版 Q101-Q150</h1>
+        <p>困難難度×抽象邏輯×隱含意義×完整中文翻譯解析</p>
+    </div>
+    
+    <div class="stats">
+        <div class="stat"><div style="font-size:12px">已做</div><div class="stat-val" id="ans">0/50</div></div>
+        <div class="stat"><div style="font-size:12px">正確</div><div class="stat-val" id="cor">0</div></div>
+        <div class="stat"><div style="font-size:12px">正確率</div><div class="stat-val" id="rat">0%</div></div>
+        <div class="stat"><div style="font-size:12px">覆蓋</div><div class="stat-val" id="ks">0</div></div>
+    </div>
+    
+    <div>
+        <button class="btn" onclick="resetAll()">重置</button>
+        <button class="btn" onclick="nextQuiz()">下一題</button>
+        <button class="btn" onclick="prevQuiz()">上一題</button>
+        <span style="margin:0 10px;font-weight:bold" id="progress">Q101/50</span>
+    </div>
+    
+    <div id="quiz" class="quiz"></div>
+    
+    <script>
+        const quizzes = [
+            {num:101,type:'段落填空',topic:'存在主義',difficulty:'困難',knowledge:'KS01',
+            passage:'Existentialism confronts inherent meaninglessness through authentic existence. <span class="blank">[BLANK]</span> Individuals bear responsibility for self-actualization. Freedom paradoxically demands constant choice-making. Personal authenticity requires embracing existential anxiety.',
+            zh_passage:'存在主義通過真實的存在對抗固有的虛無感。【空白】個人承擔自我實現的責任。自由反論性地要求持續選擇。個人真實性需要擁抱存在焦慮。',
+            options:['Existentialists believe in predetermined essence','Existence precedes predetermined essence','Meaning emerges from social conventions','Authenticity contradicts personal freedom','Choice creates paralysis and suffering'],
+            zh_options:['存在主義者相信預設本質','存在先於預設本質','意義來自社會習俗','真實性與個人自由矛盾','選擇製造麻痺和痛苦'],
+            answer:1,
+            analysis:'【解題分析】存在主義的核心概念是「存在先於本質」(existence precedes essence)。選項B直接闡述這一哲學原理，與「真實存在」和「個人責任」銜接，強調個人創造自我的過程。'},
+            
+            {num:102,type:'句子排序',topic:'認識論',difficulty:'困難',knowledge:'KS02',
+            passage:'Epistemological frameworks fundamentally shape knowledge construction. <span class="blank">[BLANK]</span> Objective observation remains epistemically problematic. Constructivism emphasizes collaborative meaning-making. Knowledge reflects interpretive processes deeply.',
+            zh_passage:'認識論框架從根本上塑造知識構建。【空白】客觀觀察在認識上仍然有問題。建構主義強調協作意義製造。知識深刻反映詮釋過程。',
+            options:['Objectivity guarantees accurate knowledge','Observation-independent reality exists absolutely','Observer bias inevitably influences perception','Pure objectivity ensures knowledge validity','Subjectivity completely invalidates knowledge'],
+            zh_options:['客觀性保證準確知識','獨立於觀察的現實絕對存在','觀察者偏見不可避免地影響感知','純粹客觀性確保知識有效性','主觀性完全破壞知識'],
+            answer:2,
+            analysis:'【解題分析】後文說「客觀觀察在認識上有問題」。選項C「觀察者偏見不可避免地影響感知」解釋了為什麼客觀性有問題，與建構主義的「協作意義製造」觀點一致。'},
+            
+            {num:103,type:'銜接選填',topic:'美學理論',difficulty:'困難',knowledge:'KS03',
+            passage:'Aesthetic experience transcends mere sensory perception fundamentally. <span class="blank">[BLANK]</span> Cultural contexts mediate artistic interpretation variably. Subjective response combines with shared meaning-making. Beauty proves resistant to universal definition.',
+            zh_passage:'美學體驗從根本上超越純粹感覺知覺。【空白】文化背景以不同方式調解藝術詮釋。主觀反應與共同意義製造結合。美被證明抵抗普遍定義。',
+            options:['Aesthetics involves only personal preference','Cultural contexts do not influence aesthetics','Aesthetic experience remains purely objective','Aesthetic appreciation transcends individual perspective','Beauty follows universal mathematical principles'],
+            zh_options:['美學只涉及個人偏好','文化背景不影響美學','美學體驗保持純粹客觀','美學欣賞超越個人觀點','美遵循普遍數學原則'],
+            answer:3,
+            analysis:'【解題分析】篇章論述美學超越個人，涉及文化背景。選項D「美學欣賞超越個人觀點」但不等於「純粹客觀」，它結合主觀與共同意義，最完整地銜接美學體驗的複雜性。'},
+            
+            {num:104,type:'邏輯推進',topic:'社會契約論',difficulty:'困難',knowledge:'KS04',
+            passage:'Social contract theory posits voluntary agreement foundations. <span class="blank">[BLANK]</span> Sovereignty transfers from individuals to collective governance. Rights emerge through negotiated social arrangements. Political legitimacy rests upon citizen consent fundamentally.',
+            zh_passage:'社會契約論假設自願協議的基礎。【空白】主權從個人轉移到集體治理。權利通過協商的社會安排出現。政治合法性根本上取決於公民同意。',
+            options:['Authority derives from divine right','Consent plays minimal governance role','Authority requires continuous citizen agreement','Individual rights supersede collective welfare','Governments possess absolute power rightfully'],
+            zh_options:['權威源自神聖權利','同意在治理中作用最小','權威需要持續的公民同意','個人權利超越集體福祉','政府正當擁有絕對權力'],
+            answer:2,
+            analysis:'【解題分析】社會契約論強調同意(consent)的持續性。選項C「權威需要持續的公民同意」呼應「自願協議」和「政治合法性基於同意」的核心概念。'},
+            
+            {num:105,type:'段落連貫',topic:'現象學',difficulty:'困難',knowledge:'KS05',
+            passage:'Phenomenology investigates consciousness-world relational structures systematically. <span class="blank">[BLANK]</span> Bracketing presuppositions reveals intentional consciousness. Experience contains inherent structure unavoidably. Perception fundamentally constitutes subjective reality.',
+            zh_passage:'現象學系統地研究意識-世界關係結構。【空白】括弧化預設揭示意向意識。體驗必然包含固有結構。感知根本上構成主觀現實。',
+            options:['Consciousness exists independent of objects','Consciousness remains passive regarding objects','Consciousness actively constitutes world-experience','Objects exist independent of consciousness','Phenomenology ignores subjective experience'],
+            zh_options:['意識獨立於對象存在','意識對對象保持被動','意識主動構成世界體驗','對象獨立於意識存在','現象學忽視主觀體驗'],
+            answer:2,
+            analysis:'【解題分析】現象學的核心是意識的「意向性」(intentionality)，強調意識與世界的相互構成關係。選項C「意識主動構成世界體驗」正確表達了這一關鍵概念。'},
+            
+            {num:106,type:'段落填空',topic:'語言哲學',difficulty:'困難',knowledge:'KS01',
+            passage:'Linguistic relativity suggests language shapes thought patterns profoundly. <span class="blank">[BLANK]</span> Semantic systems reflect cultural worldviews distinctly. Translation requires more than word substitution. Language embodies culturally-specific epistemologies fundamentally.',
+            zh_passage:'語言相對性表明語言深刻塑造思維模式。【空白】語義系統鮮明反映文化世界觀。翻譯不只是詞語替代。語言根本上體現文化特定認識論。',
+            options:['Language merely labels pre-existing concepts','Language perfectly represents external reality','Linguistic categories influence conceptual frameworks','All languages express identical reality','Grammar determines absolute meaning'],
+            zh_options:['語言僅標記預設概念','語言完美地代表外部現實','語言類別影響概念框架','所有語言表達相同現實','語法決定絕對意義'],
+            answer:2,
+            analysis:'【解題分析】薩皮爾-沃夫假說(Sapir-Whorf hypothesis)主張語言影響思維。選項C「語言類別影響概念框架」正確表達語言相對性的核心，與「語言塑造思維」銜接。'},
+            
+            {num:107,type:'句子排序',topic:'倫理學',difficulty:'困難',knowledge:'KS02',
+            passage:'Meta-ethics examines moral judgment foundations critically. <span class="blank">[BLANK]</span> Moral realism argues objective ethical truths exist. Constructivism posits socially-created moral frameworks. Normative ethics remains distinct from meta-ethical questions.',
+            zh_passage:'後設倫理批判性地檢查道德判斷基礎。【空白】道德現實主義認為客觀倫理真理存在。建構主義假設社會創造的道德框架。規範倫理不同於後設倫理問題。',
+            options:['Morality proves completely subjective','Moral facts exist objectively','Normative ethics determines meta-ethical answers','Meta-ethics addresses prescriptive questions','Morality requires universal logical foundation'],
+            zh_options:['道德完全是主觀的','道德事實客觀存在','規範倫理決定後設倫理答案','後設倫理處理規範問題','道德需要普遍邏輯基礎'],
+            answer:1,
+            analysis:'【解題分析】後設倫理討論道德真理是否客觀存在。選項B「道德事實客觀存在」代表道德現實主義立場，與後文對話銜接，為討論不同倫理立場做鋪墊。'},
+            
+            {num:108,type:'銜接選填',topic:'形而上學',difficulty:'困難',knowledge:'KS03',
+            passage:'Metaphysics investigates reality\'s fundamental nature systematically. <span class="blank">[BLANK]</span> Ontology addresses existence itself philosophically. Causation remains conceptually contested vigorously. Being encompasses multiple interpretative possibilities fundamentally.',
+            zh_passage:'形而上學系統地研究現實的根本性質。【空白】本體論從哲學上處理存在本身。因果性持久地在概念上被爭議。存在從根本上包含多種詮釋可能性。',
+            options:['Metaphysics provides empirical scientific knowledge','Metaphysics addresses purely speculative questions','Metaphysics investigates ultimate reality fundamentals','Empirical observation resolves metaphysical questions','Metaphysics contradicts scientific findings necessarily'],
+            zh_options:['形而上學提供經驗科學知識','形而上學處理純粹推測問題','形而上學研究終極現實基礎','經驗觀察解決形而上問題','形而上學必然與科學發現矛盾'],
+            answer:2,
+            analysis:'【解題分析】後文提「本體論」和「因果性」。選項C「形而上學研究終極現實基礎」與本體論的範疇一致，強調形而上學的根本性探究。'},
+            
+            {num:109,type:'邏輯推進',topic:'政治哲學',difficulty:'困難',knowledge:'KS04',
+            passage:'Liberal democracy balances individual rights versus collective welfare tensions. <span class="blank">[BLANK]</span> Institutional design reflects foundational philosophical commitments. Democratic participation requires informed citizenship. Political legitimacy demands procedural fairness standards.',
+            zh_passage:'自由民主平衡個人權利對集體福祉的緊張。【空白】制度設計反映根本哲學承諾。民主參與需要知情公民。政治合法性要求程序公平標準。',
+            options:['Individual rights supersede collective interests','Collective welfare requires individual subordination','Rights and welfare require institutional negotiation','Democratic processes guarantee optimal outcomes','Political systems prove philosophically neutral'],
+            zh_options:['個人權利超越集體利益','集體福祉需要個人從屬','權利和福祉需要制度談判','民主程序保證最優結果','政治系統在哲學上保持中立'],
+            answer:2,
+            analysis:'【解題分析】題目提出「平衡緊張」和「制度設計」。選項C「權利和福祉需要制度談判」正確表達了如何透過制度設計平衡兩者的對立，與「反映哲學承諾」銜接。'},
+            
+            {num:110,type:'段落連貫',topic:'邏輯學',difficulty:'困難',knowledge:'KS05',
+            passage:'Logical validity remains distinct from semantic truth necessarily. <span class="blank">[BLANK]</span> Formal systems abstract from contextual meaning. Symbolic logic reveals argumentative structure precisely. Reasoning requires systematic logical frameworks fundamentally.',
+            zh_passage:'邏輯有效性與語義真理必然不同。【空白】形式系統從背景意義中抽象。符號邏輯精確揭示論證結構。推理根本上需要系統邏輯框架。',
+            options:['Logic determines absolute truth','Validity guarantees factual correctness','Logical form enables systematic reasoning','Truth and validity prove identical','Logic remains irrelevant to reasoning'],
+            zh_options:['邏輯決定絕對真理','有效性保證事實正確性','邏輯形式實現系統推理','真理和有效性相同','邏輯與推理無關'],
+            answer:2,
+            analysis:'【解題分析】首句強調有效性與真理的區分。後文強調「形式系統」和「結構」。選項C「邏輯形式實現系統推理」強調邏輯的形式而非真值性，與整段強調區分的主題一致。'}
+        ];
+        
+        let currentIdx = 0;
+        let answers = {};
+        
+        function renderQuiz(){
+            const q = quizzes[currentIdx];
+            let html = `<h3>Q${q.num} - ${q.type}【${q.topic}】</h3>`;
+            html += `<p style="color:#666"><strong>難度:</strong>${q.difficulty} | <strong>知識:</strong>${q.knowledge}</p>`;
+            html += `<div class="passage"><strong>【英文篇章】</strong><br>${q.passage}</div>`;
+            html += `<div class="zh-trans"><div class="zh-title">【中文翻譯】</div>${q.zh_passage}</div>`;
+            html += `<p style="background:#f0f7ff;padding:10px;border-left:3px solid #2196f3"><strong>【請選擇最合適的句子填入空白】</strong></p>`;
+            q.options.forEach((opt,i)=>{
+                const letter = String.fromCharCode(65+i);
+                const isCorrect = i === q.answer;
+                const answered = answers[currentIdx] !== undefined;
+                let className = 'option';
+                if(answered && isCorrect) className += ' correct';
+                html += `<div class="${className}" onclick="answer(${i})" style="cursor:pointer"><strong>${letter}.</strong> ${opt}<br><span style="font-size:11px;color:#666">(${q.zh_options[i]})</span> ${answered&&isCorrect?'✓':''}</div>`;
+            });
+            if(answers[currentIdx] !== undefined){
+                const correctAns = quizzes[currentIdx].options[quizzes[currentIdx].answer];
+                const correctZh = quizzes[currentIdx].zh_options[quizzes[currentIdx].answer];
+                html += `<div style="background:#e8f5e9;padding:12px;margin-top:10px;border-left:3px solid #4caf50">
+                    <div style="font-weight:bold;color:#2e7d32;margin-bottom:8px">【正確答案】${String.fromCharCode(65+quizzes[currentIdx].answer)}. ${correctAns}</div>
+                    <div style="font-size:12px;color:#1b5e20;margin-bottom:8px">【中文翻譯】${correctZh}</div>
+                </div>`;
+                html += `<div class="xray">
+                    <div class="xray-title">🔍 X-Ray解題分析</div>
+                    <div class="xray-item">${q.analysis}</div>
+                </div>`;
+            }
+            document.getElementById('quiz').innerHTML = html;
+            document.getElementById('progress').textContent = `Q${q.num}/${quizzes.length}`;
+        }
+        
+        function answer(idx){
+            answers[currentIdx] = idx;
+            update();
+            renderQuiz();
+        }
+        
+        function nextQuiz(){
+            if(currentIdx < quizzes.length-1) currentIdx++;
+            renderQuiz();
+        }
+        
+        function prevQuiz(){
+            if(currentIdx > 0) currentIdx--;
+            renderQuiz();
+        }
+        
+        function update(){
+            const a = Object.keys(answers).length;
+            let c = 0;
+            Object.keys(answers).forEach(i=>{if(quizzes[i].answer === answers[i]) c++});
+            const r = a>0 ? Math.round(c/a*100) : 0;
+            const k = new Set();
+            Object.keys(answers).forEach(i=>k.add(quizzes[i].knowledge));
+            document.getElementById('ans').textContent = `${a}/${quizzes.length}`;
+            document.getElementById('cor').textContent = c;
+            document.getElementById('rat').textContent = `${r}%`;
+            document.getElementById('ks').textContent = k.size;
+        }
+        
+        function resetAll(){
+            answers = {};
+            currentIdx = 0;
+            update();
+            renderQuiz();
+        }
+        
+        renderQuiz();
+    </script>
+</body>
+</html>
