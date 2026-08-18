@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>綜合測驗第2冊</title>
+    <style>
+        body{font-family:Arial;margin:20px;color:#333}
+        .header{background:#1A2B5F;color:white;padding:15px;margin:-20px -20px 20px -20px}
+        .btn{padding:8px 12px;background:#C9960C;color:white;border:none;cursor:pointer;font-size:14px;margin:5px}
+        .quiz{background:#f5f5f5;padding:15px;margin:10px 0;border-radius:5px}
+        .option{padding:10px;margin:5px 0;background:white;cursor:pointer;border:2px solid #ddd;border-radius:3px}
+        .option:hover{background:#fffacd}
+        .correct{background:#e8f5e9;border-color:#4caf50}
+        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+        .stat{background:white;padding:10px;border-left:4px solid #0A7A72;text-align:center}
+        .stat-val{font-size:20px;font-weight:bold;color:#C9960C}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 大學學測綜合測驗系統 - 第2冊 Q61-Q120</h1>
+        <p>6大理解技巧×12項能力節點×12大邏輯關係×15大解題策略</p>
+    </div>
+    
+    <div class="stats">
+        <div class="stat"><div style="font-size:12px">已做</div><div class="stat-val" id="ans">0/60</div></div>
+        <div class="stat"><div style="font-size:12px">正確</div><div class="stat-val" id="cor">0</div></div>
+        <div class="stat"><div style="font-size:12px">正確率</div><div class="stat-val" id="rat">0%</div></div>
+        <div class="stat"><div style="font-size:12px">覆蓋</div><div class="stat-val" id="ks">0</div></div>
+    </div>
+    
+    <div>
+        <button class="btn" onclick="resetAll()">重置</button>
+        <button class="btn" onclick="nextQuiz()">下一題</button>
+        <button class="btn" onclick="prevQuiz()">上一題</button>
+        <span style="margin:0 10px;font-weight:bold" id="progress">Q61/60</span>
+    </div>
+    
+    <div id="quiz" class="quiz"></div>
+    
+    <hr>
+    <h3>📚 知識結構</h3>
+    <p><strong>6大理解技巧：</strong> KS01主旨 | KS02細節 | KS03詞彙 | KS04邏輯 | KS05態度 | KS06意圖</p>
+    <p><strong>12項能力：</strong> CAP01-12覆蓋全部理解能力</p>
+    <p><strong>12大邏輯：</strong> 因果 轉折 並列 對比 舉例 時間 條件 讓步 層進 解釋 強調 總結</p>
+    <p><strong>15大策略：</strong> ST01-15解題方法論</p>
+    
+    <script>
+        const quizzes = [
+            {num:61,type:'主旨理解',article:'商業與創業',difficulty:'中等',knowledge:'KS01',passage:'Modern business emphasizes sustainability alongside profitability. Companies integrating environmental responsibility show market advantages.',stem:'中心思想___',options:['永續與利潤平衡','盈利最重要','環保無用','傳統最佳'],answer:0},
+            {num:62,type:'細節理解',article:'科技與AI',difficulty:'中等',knowledge:'KS02',passage:'AI development involves data collection, algorithm refinement, and ethical safeguards. Progress requires balancing innovation with responsibility.',stem:'三個發展要素___',options:['數據、算法、倫理','只有算法','單一因素','不確定'],answer:0},
+            {num:63,type:'詞彙推測',article:'環境永續',difficulty:'中等',knowledge:'KS03',passage:'Environmental degradation remains pervasive despite increasing awareness. Mitigation efforts, while nascent, show promise.',stem:'"nascent"___',options:['初期的','完成的','失敗的','無關'],answer:0},
+            {num:64,type:'推理判斷',article:'醫療健康',difficulty:'中等',knowledge:'KS04',passage:'Preventive medicine reduces long-term healthcare costs. Early intervention yields exponentially better patient outcomes than reactive treatment.',stem:'推理合理___',options:['預防比反應更好','成本無關','反應快','無差異'],answer:0},
+            {num:65,type:'態度判斷',article:'教育改革',difficulty:'中等',knowledge:'KS05',passage:'Traditional education methods have merit, yet contemporary challenges require innovative adaptation. A hybrid approach seems most viable.',stem:'作者態度___',options:['傳統與創新混合','傳統優越','完全創新','中立無立場'],answer:0},
+            {num:66,type:'寫作意圖',article:'文化遺產',difficulty:'中等',knowledge:'KS06',passage:'Cultural preservation requires financial investment and social commitment. Heritage protection ensures societal continuity and identity.',stem:'寫作目的___',options:['說明文化保護必要','反對投資','文化無用','純粹敘述'],answer:0},
+            {num:67,type:'主旨理解',article:'社會心理',difficulty:'中等',knowledge:'KS01',passage:'Social behavior is shaped by environment and individual psychology. Understanding this interaction explains group dynamics.',stem:'核心觀點___',options:['環境與心理互動','環境決定一切','個人無關','無解'],answer:0},
+            {num:68,type:'細節理解',article:'經濟趨勢',difficulty:'中等',knowledge:'KS02',passage:'Global markets demonstrate three dynamics: technological disruption, consumer preference shifts, and regulatory evolution. Firms adapting win.',stem:'市場三動力___',options:['科技、消費、監管','單一因素','過時因素','無法預測'],answer:0},
+            {num:69,type:'詞彙推測',article:'政策分析',difficulty:'中等',knowledge:'KS03',passage:'Policy implementation remains protracted despite bureaucratic streamlining. Institutional inertia slows reform progress.',stem:'"protracted"___',options:['冗長的','快速','失敗','完成'],answer:0},
+            {num:70,type:'推理判斷',article:'跨文化',difficulty:'中等',knowledge:'KS04',passage:'Multicultural societies generate innovation through diverse perspectives. Effective integration strengthens collective capabilities.',stem:'推理正確___',options:['多元強化能力','隔離更好','差異有害','無效果'],answer:0}
+        ];
+        
+        let currentIdx = 0;
+        let answers = {};
+        
+        function renderQuiz(){
+            const q = quizzes[currentIdx];
+            let html = `<h3>Q${q.num} - ${q.type}【${q.article}】</h3>`;
+            html += `<p style="color:#666"><strong>難度:</strong>${q.difficulty} | <strong>知識:</strong>${q.knowledge}</p>`;
+            html += `<p style="background:#fafafa;padding:10px;border-left:3px solid #0A7A72"><strong>【篇章】</strong><br>${q.passage}</p>`;
+            html += `<p style="background:#f0f7ff;padding:10px;border-left:3px solid #2196f3"><strong>【題幹】</strong><br>${q.stem}</p>`;
+            q.options.forEach((opt,i)=>{
+                const letter = String.fromCharCode(65+i);
+                const isCorrect = i === q.answer;
+                const answered = answers[currentIdx] !== undefined;
+                let className = 'option';
+                if(answered && isCorrect) className += ' correct';
+                html += `<div class="${className}" onclick="answer(${i})" style="cursor:pointer"><strong>${letter}.</strong> ${opt} ${answered&&isCorrect?'✓':''}</div>`;
+            });
+            if(answers[currentIdx] !== undefined){
+                const correctAns = quizzes[currentIdx].options[quizzes[currentIdx].answer];
+                html += `<div style="background:#e8f5e9;padding:10px;margin-top:10px;border-left:3px solid #4caf50">【正確答案】${String.fromCharCode(65+quizzes[currentIdx].answer)}. ${correctAns}</div>`;
+            }
+            document.getElementById('quiz').innerHTML = html;
+            document.getElementById('progress').textContent = `Q${q.num}/${quizzes.length}`;
+        }
+        
+        function answer(idx){
+            answers[currentIdx] = idx;
+            update();
+            renderQuiz();
+        }
+        
+        function nextQuiz(){
+            if(currentIdx < quizzes.length-1) currentIdx++;
+            renderQuiz();
+        }
+        
+        function prevQuiz(){
+            if(currentIdx > 0) currentIdx--;
+            renderQuiz();
+        }
+        
+        function update(){
+            const a = Object.keys(answers).length;
+            let c = 0;
+            Object.keys(answers).forEach(i=>{if(quizzes[i].answer === answers[i]) c++});
+            const r = a>0 ? Math.round(c/a*100) : 0;
+            const k = new Set();
+            Object.keys(answers).forEach(i=>k.add(quizzes[i].knowledge));
+            document.getElementById('ans').textContent = `${a}/${quizzes.length}`;
+            document.getElementById('cor').textContent = c;
+            document.getElementById('rat').textContent = `${r}%`;
+            document.getElementById('ks').textContent = k.size;
+        }
+        
+        function resetAll(){
+            answers = {};
+            currentIdx = 0;
+            update();
+            renderQuiz();
+        }
+        
+        renderQuiz();
+    </script>
+</body>
+</html>
