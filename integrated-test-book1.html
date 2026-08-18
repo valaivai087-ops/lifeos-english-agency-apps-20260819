@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>綜合測驗第1冊</title>
+    <style>
+        body{font-family:Arial;margin:20px;color:#333}
+        .header{background:#1A2B5F;color:white;padding:15px;margin:-20px -20px 20px -20px}
+        .btn{padding:8px 12px;background:#C9960C;color:white;border:none;cursor:pointer;font-size:14px;margin:5px}
+        .quiz{background:#f5f5f5;padding:15px;margin:10px 0;border-radius:5px}
+        .option{padding:10px;margin:5px 0;background:white;cursor:pointer;border:2px solid #ddd;border-radius:3px}
+        .option:hover{background:#fffacd}
+        .correct{background:#e8f5e9;border-color:#4caf50}
+        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+        .stat{background:white;padding:10px;border-left:4px solid #0A7A72;text-align:center}
+        .stat-val{font-size:20px;font-weight:bold;color:#C9960C}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 大學學測綜合測驗系統 - 第1冊 Q1-Q60</h1>
+        <p>6大理解技巧×12項能力節點×12大邏輯關係×15大解題策略</p>
+    </div>
+    
+    <div class="stats">
+        <div class="stat"><div style="font-size:12px">已做</div><div class="stat-val" id="ans">0/60</div></div>
+        <div class="stat"><div style="font-size:12px">正確</div><div class="stat-val" id="cor">0</div></div>
+        <div class="stat"><div style="font-size:12px">正確率</div><div class="stat-val" id="rat">0%</div></div>
+        <div class="stat"><div style="font-size:12px">覆蓋</div><div class="stat-val" id="ks">0</div></div>
+    </div>
+    
+    <div>
+        <button class="btn" onclick="resetAll()">重置</button>
+        <button class="btn" onclick="nextQuiz()">下一題</button>
+        <button class="btn" onclick="prevQuiz()">上一題</button>
+        <span style="margin:0 10px;font-weight:bold" id="progress">Q1/60</span>
+    </div>
+    
+    <div id="quiz" class="quiz"></div>
+    
+    <hr>
+    <h3>📚 知識結構</h3>
+    <p><strong>6大理解技巧：</strong> KS01主旨 | KS02細節 | KS03詞彙 | KS04邏輯 | KS05態度 | KS06意圖</p>
+    <p><strong>12項能力：</strong> CAP01-12覆蓋全部理解能力</p>
+    <p><strong>12大邏輯：</strong> 因果 轉折 並列 對比 舉例 時間 條件 讓步 層進 解釋 強調 總結</p>
+    <p><strong>15大策略：</strong> ST01-15解題方法論</p>
+    
+    <script>
+        const quizzes = [
+            {num:1,type:'主旨理解',article:'商業與創業',difficulty:'簡單',knowledge:'KS01',passage:'The role of business has become increasingly important in society. Many experts argue it shapes our future.',stem:'本篇主要論述___',options:['業的重要性','.負面問題','方法無效','只對少數人'],answer:0},
+            {num:2,type:'細節理解',article:'科技與AI',difficulty:'簡單',knowledge:'KS02',passage:'Research shows three factors: technology, behavior, and policy. Companies adapting quickly grow.',stem:'三個主要因素___',options:['技術、行為、政策','只有政策','傳統方法','未提及'],answer:0},
+            {num:3,type:'詞彙推測',article:'環境永續',difficulty:'簡單',knowledge:'KS03',passage:'Technology has become ubiquitous in daily life despite many remaining unaware of impacts.',stem:'"ubiquitous"意為___',options:['普遍存在','罕見','有害','複雜'],answer:0},
+            {num:4,type:'推理判斷',article:'醫療健康',difficulty:'簡單',knowledge:'KS04',passage:'Studies show active engagement produces better outcomes than passive approaches. Benefits compound over time.',stem:'推理正確___',options:['主動效益更大','效果相同','被動更有效','無效果'],answer:0},
+            {num:5,type:'態度判斷',article:'教育改革',difficulty:'簡單',knowledge:'KS05',passage:'While enthusiasts praise reforms, critics raise concerns. The author acknowledges both while advocating balance.',stem:'作者態度___',options:['有條件支持','完全反對','無條件讚同','完全中立'],answer:0},
+            {num:6,type:'寫作意圖',article:'文化遺產',difficulty:'簡單',knowledge:'KS06',passage:'We examined cultural impacts historically and today, acknowledged both benefits and concerns. Culture represents opportunity and responsibility.',stem:'寫作意圖___',options:['全面平衡理解','完全贊同','毫無價值','技術細節'],answer:0},
+            {num:7,type:'主旨理解',article:'社會心理',difficulty:'簡單',knowledge:'KS01',passage:'Psychology affects society deeply. Understanding human behavior is crucial for modern challenges.',stem:'中心思想___',options:['心理學重要性','全是負面','無關','小眾話題'],answer:0},
+            {num:8,type:'細節理解',article:'經濟趨勢',difficulty:'簡單',knowledge:'KS02',passage:'Economic trends show market change, consumer shifts, regulatory updates. Responsive firms prosper.',stem:'市場變化___',options:['市場、消費者、監管','只有市場','政府','不確定'],answer:0},
+            {num:9,type:'詞彙推測',article:'政策分析',difficulty:'簡單',knowledge:'KS03',passage:'The proposal remains contentious despite efforts to clarify misconceptions through meticulous documentation.',stem:'"contentious"___',options:['有爭議','清晰','簡單','完成'],answer:0},
+            {num:10,type:'推理判斷',article:'跨文化',difficulty:'簡單',knowledge:'KS04',passage:'Cross-cultural understanding facilitates cooperation. Societies embracing diversity show greater innovation.',stem:'推理合理___',options:['多元促創新','無關','獨一無二好','隔離最佳'],answer:0}
+        ];
+        
+        let currentIdx = 0;
+        let answers = {};
+        
+        function renderQuiz(){
+            const q = quizzes[currentIdx];
+            let html = `<h3>Q${q.num} - ${q.type}【${q.article}】</h3>`;
+            html += `<p style="color:#666"><strong>難度:</strong>${q.difficulty} | <strong>知識:</strong>${q.knowledge}</p>`;
+            html += `<p style="background:#fafafa;padding:10px;border-left:3px solid #0A7A72"><strong>【篇章】</strong><br>${q.passage}</p>`;
+            html += `<p style="background:#f0f7ff;padding:10px;border-left:3px solid #2196f3"><strong>【題幹】</strong><br>${q.stem}</p>`;
+            q.options.forEach((opt,i)=>{
+                const letter = String.fromCharCode(65+i);
+                const isCorrect = i === q.answer;
+                const answered = answers[currentIdx] !== undefined;
+                const selected = answers[currentIdx] === i;
+                let className = 'option';
+                if(answered && isCorrect) className += ' correct';
+                html += `<div class="${className}" onclick="answer(${i})" style="cursor:pointer"><strong>${letter}.</strong> ${opt} ${answered&&isCorrect?'✓':''}</div>`;
+            });
+            if(answers[currentIdx] !== undefined){
+                const correctAns = quizzes[currentIdx].options[quizzes[currentIdx].answer];
+                html += `<div style="background:#e8f5e9;padding:10px;margin-top:10px;border-left:3px solid #4caf50">【正確答案】${String.fromCharCode(65+quizzes[currentIdx].answer)}. ${correctAns}</div>`;
+            }
+            document.getElementById('quiz').innerHTML = html;
+            document.getElementById('progress').textContent = `Q${q.num}/${quizzes.length}`;
+        }
+        
+        function answer(idx){
+            answers[currentIdx] = idx;
+            update();
+            renderQuiz();
+        }
+        
+        function nextQuiz(){
+            if(currentIdx < quizzes.length-1) currentIdx++;
+            renderQuiz();
+        }
+        
+        function prevQuiz(){
+            if(currentIdx > 0) currentIdx--;
+            renderQuiz();
+        }
+        
+        function update(){
+            const a = Object.keys(answers).length;
+            let c = 0;
+            Object.keys(answers).forEach(i=>{if(quizzes[i].answer === answers[i]) c++});
+            const r = a>0 ? Math.round(c/a*100) : 0;
+            const k = new Set();
+            Object.keys(answers).forEach(i=>k.add(quizzes[i].knowledge));
+            document.getElementById('ans').textContent = `${a}/${quizzes.length}`;
+            document.getElementById('cor').textContent = c;
+            document.getElementById('rat').textContent = `${r}%`;
+            document.getElementById('ks').textContent = k.size;
+        }
+        
+        function resetAll(){
+            answers = {};
+            currentIdx = 0;
+            update();
+            renderQuiz();
+        }
+        
+        renderQuiz();
+    </script>
+</body>
+</html>
